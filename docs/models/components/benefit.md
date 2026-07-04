@@ -1,0 +1,168 @@
+# Benefit
+
+
+## Supported Types
+
+### `components.BenefitCustom`
+
+```typescript
+const value: components.BenefitCustom = {
+  id: "<value>",
+  createdAt: new Date("2024-08-25T14:42:37.044Z"),
+  modifiedAt: new Date("2025-04-13T00:00:15.234Z"),
+  type: "custom",
+  description: "how nor limited scoff ownership",
+  selectable: false,
+  deletable: true,
+  isDeleted: false,
+  organizationId: "<value>",
+  metadata: {},
+  properties: {
+    note: "<value>",
+  },
+};
+```
+
+### `components.BenefitDiscord`
+
+```typescript
+const value: components.BenefitDiscord = {
+  id: "<value>",
+  createdAt: new Date("2026-05-26T06:25:53.245Z"),
+  modifiedAt: new Date("2025-12-27T10:01:08.309Z"),
+  type: "discord",
+  description: "after incidentally whose",
+  selectable: false,
+  deletable: true,
+  isDeleted: false,
+  organizationId: "<value>",
+  metadata: {},
+  properties: {
+    guildId: "<id>",
+    roleId: "<id>",
+    kickMember: false,
+    guildToken: "<value>",
+  },
+};
+```
+
+### `components.BenefitDownloadables`
+
+```typescript
+const value: components.BenefitDownloadables = {
+  id: "<value>",
+  createdAt: new Date("2024-10-18T18:24:22.763Z"),
+  modifiedAt: new Date("2025-09-19T16:48:07.217Z"),
+  type: "downloadables",
+  description: "supposing allocation dull scowl bootleg illiterate hmph amid",
+  selectable: true,
+  deletable: true,
+  isDeleted: false,
+  organizationId: "<value>",
+  metadata: {
+    "key": 3971.46,
+  },
+  properties: {
+    archived: {
+      "key": false,
+      "key1": false,
+    },
+    files: [
+      "<value 1>",
+      "<value 2>",
+      "<value 3>",
+    ],
+  },
+};
+```
+
+### `components.BenefitFeatureFlag`
+
+```typescript
+const value: components.BenefitFeatureFlag = {
+  id: "<value>",
+  createdAt: new Date("2026-01-23T21:17:09.985Z"),
+  modifiedAt: new Date("2026-03-18T19:56:22.426Z"),
+  type: "feature_flag",
+  description: "while dreary bestride revoke continually hm so terrible",
+  selectable: true,
+  deletable: true,
+  isDeleted: true,
+  organizationId: "<value>",
+  metadata: {},
+  properties: {},
+};
+```
+
+### `components.BenefitGitHubRepository`
+
+```typescript
+const value: components.BenefitGitHubRepository = {
+  id: "<value>",
+  createdAt: new Date("2026-09-20T17:50:31.812Z"),
+  modifiedAt: new Date("2024-09-08T10:06:16.908Z"),
+  type: "github_repository",
+  description: "hoarse secrecy entwine stunning energetically",
+  selectable: true,
+  deletable: true,
+  isDeleted: false,
+  organizationId: "<value>",
+  metadata: {
+    "key": 8581.7,
+  },
+  properties: {
+    repositoryOwner: "pago-sh",
+    repositoryName: "private_repo",
+    permission: "triage",
+  },
+};
+```
+
+### `components.BenefitLicenseKeys`
+
+```typescript
+const value: components.BenefitLicenseKeys = {
+  id: "<value>",
+  createdAt: new Date("2026-09-22T06:32:51.347Z"),
+  modifiedAt: new Date("2025-01-11T01:51:09.622Z"),
+  type: "license_keys",
+  description: "vivaciously now that",
+  selectable: true,
+  deletable: true,
+  isDeleted: true,
+  organizationId: "<value>",
+  metadata: {},
+  properties: {
+    prefix: "<value>",
+    expires: null,
+    activations: {
+      limit: 240022,
+      enableCustomerAdmin: false,
+    },
+    limitUsage: null,
+  },
+};
+```
+
+### `components.BenefitMeterCredit`
+
+```typescript
+const value: components.BenefitMeterCredit = {
+  id: "<value>",
+  createdAt: new Date("2026-07-13T02:35:52.595Z"),
+  modifiedAt: new Date("2026-08-26T02:40:11.876Z"),
+  type: "meter_credit",
+  description: "pish than huzzah rekindle lively approximate against meal",
+  selectable: true,
+  deletable: false,
+  isDeleted: true,
+  organizationId: "<value>",
+  metadata: {},
+  properties: {
+    units: 507849,
+    rollover: false,
+    meterId: "<value>",
+  },
+};
+```
+

@@ -1,0 +1,99 @@
+configVersion: 2.0.0
+generation:
+  devContainers:
+    enabled: true
+    schemaPath: https://api.pago.sh/openapi.json
+  sdkClassName: Pago
+  maintainOpenAPIOrder: true
+  usageSnippets:
+    optionalPropertyRendering: withExample
+    sdkInitStyle: constructor
+  useClassNamesForArrayFields: true
+  fixes:
+    nameResolutionDec2023: true
+    nameResolutionFeb2025: false
+    parameterOrderingFeb2024: true
+    requestResponseComponentNamesFeb2024: true
+    securityFeb2025: false
+    sharedErrorComponentsApr2025: false
+    sharedNestedComponentsJan2026: false
+    nameOverrideFeb2026: false
+  auth:
+    oAuth2ClientCredentialsEnabled: true
+    oAuth2PasswordEnabled: false
+    hoistGlobalSecurity: true
+  schemas:
+    allOfMergeStrategy: shallowMerge
+  requestBodyFieldName: ""
+  versioningStrategy: automatic
+  persistentEdits: {}
+  tests:
+    generateTests: true
+    generateNewTests: false
+    skipResponseBodyAssertions: false
+typescript:
+  version: 1.0.0
+  acceptHeaderEnum: true
+  additionalDependencies:
+    dependencies:
+      standardwebhooks: ^1.0.0
+    devDependencies:
+      '@types/jest': '*'
+      '@types/node': '*'
+      jest: '*'
+      ts-jest: '*'
+    peerDependencies: {}
+  additionalPackageJSON: {}
+  additionalScripts: {}
+  alwaysIncludeInboundAndOutbound: false
+  author: Speakeasy
+  baseErrorName: PagoError
+  clientServerStatusCodesAsErrors: true
+  constFieldsAlwaysOptional: false
+  defaultErrorName: SDKError
+  enableCustomCodeRegions: false
+  enableMCPServer: false
+  enableReactQuery: false
+  enumFormat: union
+  envVarPrefix: PAGO
+  exportZodModelNamespace: false
+  fixEnumNameSanitization: false
+  flatAdditionalProperties: false
+  flattenGlobalSecurity: true
+  flatteningOrder: body-first
+  formStringArrayEncodeMode: encoded-string
+  forwardCompatibleEnumsByDefault: true
+  forwardCompatibleUnionsByDefault: false
+  generateExamples: true
+  imports:
+    option: openapi
+    paths:
+      callbacks: models/callbacks
+      errors: models/errors
+      operations: models/operations
+      shared: models/components
+      webhooks: models/webhooks
+  inferUnionDiscriminators: true
+  inputModelSuffix: input
+  jsonpath: legacy
+  laxMode: strict
+  legacyFileNaming: true
+  maxMethodParams: 0
+  methodArguments: require-security-and-request
+  modelPropertyCasing: camel
+  moduleFormat: dual
+  multipartArrayFormat: legacy
+  outputModelSuffix: output
+  packageName: '@pago-sh/sdk'
+  preApplyUnionDiscriminators: true
+  preserveModelFieldNames: false
+  privateIdentifierPrefix: '#'
+  responseFormat: flat
+  sseFlatResponse: false
+  templateVersion: v2
+  unionStrategy: populated-fields
+  usageSDKInitImports: []
+  useIndexModules: false
+  useOxlint: false
+  useTsgo: false
+  zodVersion: v4-mini

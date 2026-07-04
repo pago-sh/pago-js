@@ -1,0 +1,46 @@
+speakeasyVersion: 1.771.0
+sources:
+    Pago-OAS:
+        sourceNamespace: pago-oas
+        sourceRevisionDigest: sha256:fb5658168dcbef75b745b105c86962b85b6a8e3c15d94caa1e015a141a64dea0
+        sourceBlobDigest: sha256:46f772f1560859286f6e8a686cf4f6dc6787bcb62f70d9974645ec89777b3d62
+        tags:
+            - latest
+            - 0.1.0
+targets:
+    pago:
+        source: Pago-OAS
+        sourceNamespace: pago-oas
+        sourceRevisionDigest: sha256:fb5658168dcbef75b745b105c86962b85b6a8e3c15d94caa1e015a141a64dea0
+        sourceBlobDigest: sha256:46f772f1560859286f6e8a686cf4f6dc6787bcb62f70d9974645ec89777b3d62
+        codeSamplesNamespace: pago-oas-ts-code-samples
+        codeSamplesRevisionDigest: sha256:365be1b1befc8379cb28f93b72c30e206469347332da51b174aaa0ff51ed4bbc
+workflow:
+    workflowVersion: 1.0.0
+    speakeasyVersion: latest
+    sources:
+        Pago-OAS:
+            inputs:
+                - location: https://api.pago.sh/openapi.json
+            overlays:
+                - location: https://raw.githubusercontent.com/pago-sh/pago/main/sdk/overlays/security.yml
+                - location: https://raw.githubusercontent.com/pago-sh/pago/main/sdk/overlays/type_parameter.yml
+                - location: https://raw.githubusercontent.com/pago-sh/pago/main/sdk/overlays/read_only.yml
+                - location: https://raw.githubusercontent.com/pago-sh/pago/main/sdk/overlays/event_discriminator.yml
+                - location: https://raw.githubusercontent.com/pago-sh/pago/main/sdk/overlays/timezone_enum.yml
+                - location: https://raw.githubusercontent.com/pago-sh/pago/main/sdk/overlays/event_metadata.yml
+            registry:
+                location: registry.speakeasyapi.dev/pago/pago/pago-oas
+    targets:
+        pago:
+            target: typescript
+            source: Pago-OAS
+            publish:
+                npm:
+                    token: $npm_token
+            codeSamples:
+                output: codeSamples.yaml
+                registry:
+                    location: registry.speakeasyapi.dev/pago/pago/pago-oas-ts-code-samples
+                labelOverride:
+                    fixedValue: Typescript (SDK)

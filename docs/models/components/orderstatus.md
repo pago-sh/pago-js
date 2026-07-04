@@ -1,0 +1,17 @@
+# OrderStatus
+
+## Example Usage
+
+```typescript
+import { OrderStatus } from "@pago-sh/sdk/models/components/orderstatus.js";
+
+let value: OrderStatus = "void";
+
+// Open enum: unrecognized values are captured as Unrecognized<string>
+```
+
+## Values
+
+```typescript
+"draft" | "pending" | "paid" | "refunded" | "partially_refunded" | "void" | Unrecognized<string>
+```
