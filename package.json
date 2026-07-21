@@ -1,83 +1,70 @@
 {
   "name": "@pago-sh/sdk",
-  "version": "1.0.0",
-  "author": "Speakeasy",
-  "type": "module",
-  "tshy": {
-    "sourceDialects": [
-      "@pago-sh/sdk/source"
-    ],
-    "exports": {
-      ".": "./src/index.ts",
-      "./package.json": "./package.json",
-      "./*.js": "./src/*.ts",
-      "./*": "./src/*.ts"
-    }
-  },
-  "sideEffects": false,
+  "version": "1.0.0-alpha.10",
+  "description": "Pago SDK — A billing platform for the intelligence era",
+  "keywords": [
+    "api",
+    "pago",
+    "sdk",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Pago",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pago-sh-js.git"
+    "url": "git+https://github.com/pago-sh/pago.git",
+    "directory": "sdk/typescript"
   },
-  "scripts": {
-    "lint": "eslint --cache --max-warnings=0 src",
-    "build": "tshy",
-    "prepublishOnly": "npm run build"
-  },
-  "peerDependencies": {},
-  "devDependencies": {
-    "@eslint/js": "^9.26.0",
-    "@types/jest": "*",
-    "@types/node": "*",
-    "eslint": "^9.26.0",
-    "globals": "^15.14.0",
-    "jest": "*",
-    "ts-jest": "*",
-    "tshy": "^3.3.2",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.26.0"
-  },
-  "dependencies": {
-    "standardwebhooks": "^1.0.0",
-    "zod": "^3.25.65 || ^4.0.0"
-  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
   "exports": {
     ".": {
       "import": {
-        "@pago-sh/sdk/source": "./src/index.ts",
-        "types": "./dist/esm/index.d.ts",
-        "default": "./dist/esm/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/commonjs/index.d.ts",
-        "default": "./dist/commonjs/index.js"
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     },
-    "./package.json": "./package.json",
-    "./*.js": {
+    "./2026-04": {
       "import": {
-        "@pago-sh/sdk/source": "./src/*.ts",
-        "types": "./dist/esm/*.d.ts",
-        "default": "./dist/esm/*.js"
+        "types": "./dist/2026-04/index.d.mts",
+        "default": "./dist/2026-04/index.mjs"
       },
       "require": {
-        "types": "./dist/commonjs/*.d.ts",
-        "default": "./dist/commonjs/*.js"
-      }
-    },
-    "./*": {
-      "import": {
-        "@pago-sh/sdk/source": "./src/*.ts",
-        "types": "./dist/esm/*.d.ts",
-        "default": "./dist/esm/*.js"
-      },
-      "require": {
-        "types": "./dist/commonjs/*.d.ts",
-        "default": "./dist/commonjs/*.js"
+        "types": "./dist/2026-04/index.d.cts",
+        "default": "./dist/2026-04/index.cjs"
       }
     }
   },
-  "main": "./dist/commonjs/index.js",
-  "types": "./dist/commonjs/index.d.ts",
-  "module": "./dist/esm/index.js"
+  "scripts": {
+    "build": "tsdown",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
+    "standardwebhooks": "^1.0.0",
+    "tsdown": "^0.22.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@11.13.1"
 }

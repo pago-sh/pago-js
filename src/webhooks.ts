@@ -1,153 +1,175 @@
-import {
-  Webhook,
-  WebhookVerificationError as _WebhookVerificationError,
-} from "standardwebhooks";
+import { Buffer } from "node:buffer";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
-import { WebhookBenefitCreatedPayload$inboundSchema } from "./models/components/webhookbenefitcreatedpayload.js";
-import { WebhookBenefitGrantCreatedPayload$inboundSchema } from "./models/components/webhookbenefitgrantcreatedpayload.js";
-import { WebhookBenefitGrantRevokedPayload$inboundSchema } from "./models/components/webhookbenefitgrantrevokedpayload.js";
-import { WebhookBenefitGrantUpdatedPayload$inboundSchema } from "./models/components/webhookbenefitgrantupdatedpayload.js";
-import { WebhookBenefitGrantCycledPayload$inboundSchema } from "./models/components/webhookbenefitgrantcycledpayload.js";
-import { WebhookBenefitUpdatedPayload$inboundSchema } from "./models/components/webhookbenefitupdatedpayload.js";
-import { WebhookCheckoutCreatedPayload$inboundSchema } from "./models/components/webhookcheckoutcreatedpayload.js";
-import { WebhookCheckoutUpdatedPayload$inboundSchema } from "./models/components/webhookcheckoutupdatedpayload.js";
-import { WebhookOrderCreatedPayload$inboundSchema } from "./models/components/webhookordercreatedpayload.js";
-import { WebhookOrderRefundedPayload$inboundSchema } from "./models/components/webhookorderrefundedpayload.js";
-import { WebhookOrderUpdatedPayload$inboundSchema } from "./models/components/webhookorderupdatedpayload.js";
-import { WebhookOrderPaidPayload$inboundSchema } from "./models/components/webhookorderpaidpayload.js";
-import { WebhookOrganizationUpdatedPayload$inboundSchema } from "./models/components/webhookorganizationupdatedpayload.js";
-import { WebhookProductCreatedPayload$inboundSchema } from "./models/components/webhookproductcreatedpayload.js";
-import { WebhookProductUpdatedPayload$inboundSchema } from "./models/components/webhookproductupdatedpayload.js";
-import { WebhookRefundCreatedPayload$inboundSchema } from "./models/components/webhookrefundcreatedpayload.js";
-import { WebhookRefundUpdatedPayload$inboundSchema } from "./models/components/webhookrefundupdatedpayload.js";
-import { WebhookSubscriptionActivePayload$inboundSchema } from "./models/components/webhooksubscriptionactivepayload.js";
-import { WebhookSubscriptionCanceledPayload$inboundSchema } from "./models/components/webhooksubscriptioncanceledpayload.js";
-import { WebhookSubscriptionCreatedPayload$inboundSchema } from "./models/components/webhooksubscriptioncreatedpayload.js";
-import { WebhookSubscriptionRevokedPayload$inboundSchema } from "./models/components/webhooksubscriptionrevokedpayload.js";
-import { WebhookSubscriptionUncanceledPayload$inboundSchema } from "./models/components/webhooksubscriptionuncanceledpayload.js";
-import { WebhookSubscriptionUpdatedPayload$inboundSchema } from "./models/components/webhooksubscriptionupdatedpayload.js";
-import { WebhookCustomerCreatedPayload$inboundSchema } from "./models/components/webhookcustomercreatedpayload.js";
-import { WebhookCustomerUpdatedPayload$inboundSchema } from "./models/components/webhookcustomerupdatedpayload.js";
-import { WebhookCustomerDeletedPayload$inboundSchema } from "./models/components/webhookcustomerdeletedpayload.js";
-import { WebhookCustomerStateChangedPayload$inboundSchema } from "./models/components/webhookcustomerstatechangedpayload.js";
-import { WebhookCustomerSeatAssignedPayload$inboundSchema } from "./models/components/webhookcustomerseatassignedpayload.js";
-import { WebhookCustomerSeatClaimedPayload$inboundSchema } from "./models/components/webhookcustomerseatclaimedpayload.js";
-import { WebhookCustomerSeatRevokedPayload$inboundSchema } from "./models/components/webhookcustomerseatrevokedpayload.js";
-import { WebhookMemberCreatedPayload$inboundSchema } from "./models/components/webhookmembercreatedpayload.js";
-import { WebhookMemberUpdatedPayload$inboundSchema } from "./models/components/webhookmemberupdatedpayload.js";
-import { WebhookMemberDeletedPayload$inboundSchema } from "./models/components/webhookmemberdeletedpayload.js";
-import { WebhookCheckoutExpiredPayload$inboundSchema } from "./models/components/webhookcheckoutexpiredpayload.js";
-import { WebhookSubscriptionPastDuePayload$inboundSchema } from "./models/components/webhooksubscriptionpastduepayload.js";
-import { SDKValidationError } from "./models/errors/sdkvalidationerror.js";
+import { PagoError } from "./base";
 
-class WebhookVerificationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.message = message;
+const webhookToleranceSeconds = 5 * 60;
+const webhookSecretPrefix = "whsec_";
+const base64Alphabet = /^[A-Za-z0-9+/]*={0,2}$/;
+const integerPattern = /^-?\d+$/;
+
+export class PagoWebhookError extends PagoError {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = "PagoWebhookError";
   }
 }
 
-const parseEvent = (parsed: any) => {
-  try {
-    switch (parsed.type) {
-      case "customer.created":
-        return WebhookCustomerCreatedPayload$inboundSchema.parse(parsed);
-      case "customer.updated":
-        return WebhookCustomerUpdatedPayload$inboundSchema.parse(parsed);
-      case "customer.deleted":
-        return WebhookCustomerDeletedPayload$inboundSchema.parse(parsed);
-      case "customer.state_changed":
-        return WebhookCustomerStateChangedPayload$inboundSchema.parse(parsed);
-      case "customer_seat.assigned":
-        return WebhookCustomerSeatAssignedPayload$inboundSchema.parse(parsed);
-      case "customer_seat.claimed":
-        return WebhookCustomerSeatClaimedPayload$inboundSchema.parse(parsed);
-      case "customer_seat.revoked":
-        return WebhookCustomerSeatRevokedPayload$inboundSchema.parse(parsed);
-      case "member.created":
-        return WebhookMemberCreatedPayload$inboundSchema.parse(parsed);
-      case "member.updated":
-        return WebhookMemberUpdatedPayload$inboundSchema.parse(parsed);
-      case "member.deleted":
-        return WebhookMemberDeletedPayload$inboundSchema.parse(parsed);
-      case "benefit.created":
-        return WebhookBenefitCreatedPayload$inboundSchema.parse(parsed);
-      case "benefit_grant.created":
-        return WebhookBenefitGrantCreatedPayload$inboundSchema.parse(parsed);
-      case "benefit_grant.cycled":
-        return WebhookBenefitGrantCycledPayload$inboundSchema.parse(parsed);
-      case "benefit_grant.revoked":
-        return WebhookBenefitGrantRevokedPayload$inboundSchema.parse(parsed);
-      case "benefit_grant.updated":
-        return WebhookBenefitGrantUpdatedPayload$inboundSchema.parse(parsed);
-      case "benefit.updated":
-        return WebhookBenefitUpdatedPayload$inboundSchema.parse(parsed);
-      case "checkout.created":
-        return WebhookCheckoutCreatedPayload$inboundSchema.parse(parsed);
-      case "checkout.updated":
-        return WebhookCheckoutUpdatedPayload$inboundSchema.parse(parsed);
-      case "checkout.expired":
-        return WebhookCheckoutExpiredPayload$inboundSchema.parse(parsed);
-      case "order.created":
-        return WebhookOrderCreatedPayload$inboundSchema.parse(parsed);
-      case "order.paid":
-        return WebhookOrderPaidPayload$inboundSchema.parse(parsed);
-      case "order.updated":
-        return WebhookOrderUpdatedPayload$inboundSchema.parse(parsed);
-      case "order.refunded":
-        return WebhookOrderRefundedPayload$inboundSchema.parse(parsed);
-      case "organization.updated":
-        return WebhookOrganizationUpdatedPayload$inboundSchema.parse(parsed);
-      case "product.created":
-        return WebhookProductCreatedPayload$inboundSchema.parse(parsed);
-      case "product.updated":
-        return WebhookProductUpdatedPayload$inboundSchema.parse(parsed);
-      case "refund.created":
-        return WebhookRefundCreatedPayload$inboundSchema.parse(parsed);
-      case "refund.updated":
-        return WebhookRefundUpdatedPayload$inboundSchema.parse(parsed);
-      case "subscription.active":
-        return WebhookSubscriptionActivePayload$inboundSchema.parse(parsed);
-      case "subscription.canceled":
-        return WebhookSubscriptionCanceledPayload$inboundSchema.parse(parsed);
-      case "subscription.created":
-        return WebhookSubscriptionCreatedPayload$inboundSchema.parse(parsed);
-      case "subscription.revoked":
-        return WebhookSubscriptionRevokedPayload$inboundSchema.parse(parsed);
-      case "subscription.uncanceled":
-        return WebhookSubscriptionUncanceledPayload$inboundSchema.parse(parsed);
-      case "subscription.updated":
-        return WebhookSubscriptionUpdatedPayload$inboundSchema.parse(parsed);
-      case "subscription.past_due":
-        return WebhookSubscriptionPastDuePayload$inboundSchema.parse(parsed);
-      default:
-        throw new SDKValidationError(
-          `Unknown event type: ${parsed.type}`,
-          parsed.type,
-          parsed,
-        );
-    }
-  } catch (error) {
-    throw new SDKValidationError("Failed to parse event", error, parsed);
+export class PagoWebhookVerificationError extends PagoWebhookError {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = "PagoWebhookVerificationError";
   }
-};
+}
 
-const validateEvent = (
-  body: string | Buffer,
+export class PagoWebhookSecretError extends PagoWebhookVerificationError {
+  constructor(message: string) {
+    super(`Invalid webhook secret: ${message}`);
+    this.name = "PagoWebhookSecretError";
+  }
+}
+
+export class PagoWebhookUnknownTypeError extends PagoWebhookError {
+  constructor(public readonly eventType: string | null) {
+    super(`Unknown webhook event type: ${JSON.stringify(eventType)}`);
+    this.name = "PagoWebhookUnknownTypeError";
+  }
+}
+
+export const validateWebhook = async <Payload>(
+  body: string | Uint8Array,
   headers: Record<string, string>,
   secret: string,
-) => {
-  const base64Secret = Buffer.from(secret, "utf-8").toString("base64");
-  const webhook = new Webhook(base64Secret);
+  eventTypes: ReadonlySet<string>,
+): Promise<Payload> => {
+  const bodyBytes = typeof body === "string" ? new TextEncoder().encode(body) : body;
+  verifySignature(bodyBytes, headers, secret);
+
+  const bodyText = new TextDecoder().decode(bodyBytes);
+  let parsed: unknown;
   try {
-    const parsed = webhook.verify(body, headers);
-    return parseEvent(parsed);
+    parsed = JSON.parse(bodyText);
   } catch (error) {
-    if (error instanceof _WebhookVerificationError) {
-      throw new WebhookVerificationError(error.message);
+    throw new PagoWebhookError("Failed to parse webhook payload", {
+      cause: error,
+    });
+  }
+
+  const eventType =
+    typeof parsed === "object" &&
+    parsed !== null &&
+    "type" in parsed &&
+    typeof parsed.type === "string"
+      ? parsed.type
+      : null;
+  if (eventType === null || !eventTypes.has(eventType)) {
+    throw new PagoWebhookUnknownTypeError(eventType);
+  }
+
+  return parsed as Payload;
+};
+
+const verifySignature = (
+  body: Uint8Array,
+  headers: Record<string, string>,
+  secret: string,
+): void => {
+  const signingKey = deriveSigningKey(secret);
+
+  const normalizedHeaders = Object.fromEntries(
+    Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]),
+  );
+  const webhookId = normalizedHeaders["webhook-id"];
+  const webhookTimestamp = normalizedHeaders["webhook-timestamp"];
+  const webhookSignature = normalizedHeaders["webhook-signature"];
+  if (!webhookId || !webhookTimestamp || !webhookSignature) {
+    throw new PagoWebhookVerificationError("Missing required headers");
+  }
+
+  if (!integerPattern.test(webhookTimestamp)) {
+    throw new PagoWebhookVerificationError("Invalid signature headers");
+  }
+  const timestamp = Number(webhookTimestamp);
+  if (!Number.isSafeInteger(timestamp)) {
+    throw new PagoWebhookVerificationError("Invalid signature headers");
+  }
+
+  const now = Date.now() / 1000;
+  if (timestamp < now - webhookToleranceSeconds) {
+    throw new PagoWebhookVerificationError("Message timestamp too old");
+  }
+  if (timestamp > now + webhookToleranceSeconds) {
+    throw new PagoWebhookVerificationError("Message timestamp too new");
+  }
+
+  const signedContent = Buffer.concat([
+    Buffer.from(`${webhookId}.${webhookTimestamp}.`, "utf8"),
+    Buffer.from(body),
+  ]);
+  const expectedSignature = createHmac("sha256", signingKey).update(signedContent).digest();
+
+  let matched = false;
+  for (const versionedSignature of webhookSignature.split(" ")) {
+    const separatorIndex = versionedSignature.indexOf(",");
+    if (separatorIndex === -1) {
+      continue;
     }
-    throw error;
+    if (versionedSignature.slice(0, separatorIndex) !== "v1") {
+      continue;
+    }
+    const providedSignature = decodeBase64(versionedSignature.slice(separatorIndex + 1));
+    if (providedSignature !== null && constantTimeEqual(providedSignature, expectedSignature)) {
+      matched = true;
+    }
+  }
+
+  if (!matched) {
+    throw new PagoWebhookVerificationError("No matching signature found");
   }
 };
 
-export { validateEvent, WebhookVerificationError };
+const deriveSigningKey = (secret: string): Buffer => {
+  if (secret.length === 0) {
+    throw new PagoWebhookSecretError("secret can't be empty");
+  }
+  if (!secret.startsWith(webhookSecretPrefix)) {
+    throw new PagoWebhookSecretError(`secret must start with "${webhookSecretPrefix}"`);
+  }
+
+  const encodedKey = secret.slice(webhookSecretPrefix.length);
+  if (encodedKey.length === 0) {
+    throw new PagoWebhookSecretError(`nothing follows the "${webhookSecretPrefix}" prefix`);
+  }
+
+  const signingKey = decodeBase64(encodedKey);
+  if (signingKey === null) {
+    throw new PagoWebhookSecretError(
+      `the part after the "${webhookSecretPrefix}" prefix is not valid base64`,
+    );
+  }
+
+  return signingKey;
+};
+
+const constantTimeEqual = (left: Buffer, right: Buffer): boolean =>
+  left.length === right.length && timingSafeEqual(left, right);
+
+const decodeBase64 = (value: string): Buffer | null => {
+  if (value.length === 0 || !base64Alphabet.test(value)) {
+    return null;
+  }
+
+  const unpadded = value.replace(/=+$/, "");
+  const remainder = unpadded.length % 4;
+  if (remainder === 1) {
+    return null;
+  }
+  const padded = remainder === 0 ? unpadded : `${unpadded}${"=".repeat(4 - remainder)}`;
+
+  const decoded = Buffer.from(padded, "base64");
+  if (decoded.length === 0 || decoded.toString("base64") !== padded) {
+    return null;
+  }
+
+  return decoded;
+};

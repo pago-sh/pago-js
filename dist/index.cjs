@@ -1,0 +1,12 @@
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const require_webhooks = require("./webhooks-CG-bSKxt.cjs");
+exports.PagoClientError = require_webhooks.PagoClientError;
+exports.PagoError = require_webhooks.PagoError;
+exports.PagoNetworkError = require_webhooks.PagoNetworkError;
+exports.PagoRateLimitError = require_webhooks.PagoRateLimitError;
+exports.PagoServerError = require_webhooks.PagoServerError;
+exports.PagoWebhookError = require_webhooks.PagoWebhookError;
+exports.PagoWebhookSecretError = require_webhooks.PagoWebhookSecretError;
+exports.PagoWebhookUnknownTypeError = require_webhooks.PagoWebhookUnknownTypeError;
+exports.PagoWebhookVerificationError = require_webhooks.PagoWebhookVerificationError;
+exports.validateWebhook = require_webhooks.validateWebhook;
